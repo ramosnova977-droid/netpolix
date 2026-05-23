@@ -4,9 +4,8 @@ from flask_cors import CORS
 from app.routes.video_routes import video_bp
 from app.routes.cliente_routes import cliente_bp
 
-from app.routes.venta import venta_bp
-from app.routes.calificacion import calificacion_bp
-
+from app.routes.venta_routes import venta_bp
+from app.routes.calificacion_routes import calificacion_bp
 
 app = Flask(__name__)
 CORS(app)

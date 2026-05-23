@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.controllers.ventacontroller import comprar_video, alquilar_video, productos_mas_vendidos
+from app.controllers.venta_controller import comprar_video, alquilar_video, productos_mas_vendidos
 
 venta_bp = Blueprint('venta_bp', __name__)
 
