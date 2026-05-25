@@ -1,5 +1,6 @@
 from app.config.db import get_connection
 
+
 # LISTAR CLIENTES
 def listar_clientes():
     try:
@@ -75,8 +76,8 @@ def ver_historial(cliente_id):
         cur = conn.cursor()
 
         cur.execute("""
-            SELECT id, cliente_id, video_id, tipo, fecha, monto
-            FROM historial
+            SELECT id, cliente_id, video_isan, tipo, fecha, monto
+            FROM alquiler_compra
             WHERE cliente_id = %s
         """, (cliente_id,))
 
@@ -88,7 +89,7 @@ def ver_historial(cliente_id):
             {
                 "id": str(r[0]),
                 "cliente_id": str(r[1]),
-                "video_id": str(r[2]),
+                "video_isan": r[2],
                 "tipo": r[3],
                 "fecha": str(r[4]),
                 "monto": r[5]
@@ -128,7 +129,8 @@ def actualizar_puntos(cliente_id, puntos_a_sumar):
     except Exception as e:
         return {"error": str(e)}
 
-        # ALQUILAR O COMPRAR VIDEO
+
+# ALQUILAR O COMPRAR VIDEO
 def alquilar_comprar(data):
     if not data.get("cliente_id") or not data.get("video_isan") or not data.get("tipo"):
         return {"error": "Campos obligatorios faltantes"}
@@ -137,7 +139,6 @@ def alquilar_comprar(data):
         conn = get_connection()
         cur = conn.cursor()
 
-        # ver que el cliente tenga saldo suficiente
         cur.execute("SELECT saldo, puntos FROM cliente WHERE id = %s", (data["cliente_id"],))
         cliente = cur.fetchone()
 
@@ -151,7 +152,6 @@ def alquilar_comprar(data):
         if saldo < monto:
             return {"error": "Saldo insuficiente"}
 
-        # Registrar la transacción
         cur.execute("""
             INSERT INTO alquiler_compra (cliente_id, video_isan, tipo, monto)
             VALUES (%s, %s, %s, %s)
@@ -162,10 +162,8 @@ def alquilar_comprar(data):
             monto
         ))
 
-        # Descontar saldo
         cur.execute("UPDATE cliente SET saldo = saldo - %s WHERE id = %s", (monto, data["cliente_id"]))
 
-        # Sumar de puntos: 2 por compra, 1 por alquiler
         puntos_a_sumar = 2 if data["tipo"] == "compra" else 1
         nuevos_puntos = puntos + puntos_a_sumar
 
@@ -188,8 +186,9 @@ def alquilar_comprar(data):
 
     except Exception as e:
         return {"error": str(e)}
-    
-    # CALIFICAR VIDEO
+
+
+# CALIFICAR VIDEO
 def calificar_video(data):
     if not data.get("cliente_id") or not data.get("video_isan") or not data.get("valor"):
         return {"error": "Campos obligatorios faltantes"}
@@ -211,12 +210,13 @@ def calificar_video(data):
         cur.close()
         conn.close()
 
-        return {"message": "Calificación registrada exitosamente"}
+        return {"message": "Calificación registrada"}
 
     except Exception as e:
         return {"error": str(e)}
-    
-    # RECARGAR SALDO (SIMULACIÓN DE PAGO)
+
+
+# RECARGAR SALDO (SIMULACIÓN DE PAGO)
 def recargar_saldo(data):
     if not data.get("cliente_id") or not data.get("monto"):
         return {"error": "Campos obligatorios faltantes"}
@@ -237,7 +237,7 @@ def recargar_saldo(data):
         conn.close()
 
         return {
-            "message": "Pago simulado exitosamente",
+            "message": "Pago exitoso",
             "saldo_actual": nuevo_saldo
         }
 
