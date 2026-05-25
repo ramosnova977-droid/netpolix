@@ -3,7 +3,7 @@ from app.controllers.cliente_controller import *
 
 cliente_bp = Blueprint('cliente_bp', __name__)
 
-# 1. LISTAR de los cliente
+# 1. LISTAR de los clientes
 @cliente_bp.route('/clientes', methods=['GET'])
 def listar():
     data = listar_clientes()
@@ -12,17 +12,15 @@ def listar():
         "data": data
     })
 
-
-# 2. REGISTRo cliente
+# 2. REGISTRO cliente
 @cliente_bp.route('/clientes', methods=['POST'])
 def registrar():
     data = request.json
     resultado = registrar_cliente(data)
     return jsonify(resultado)
 
-
 # 3. Visualizar HISTORIAL
-@cliente_bp.route('/clientes/<int:cliente_id>/historial', methods=['GET'])
+@cliente_bp.route('/clientes/<string:cliente_id>/historial', methods=['GET'])
 def historial(cliente_id):
     data = ver_historial(cliente_id)
     return jsonify({
@@ -30,9 +28,8 @@ def historial(cliente_id):
         "data": data
     })
 
-
 # 4. ACTUALIZAR PUNTOS
-@cliente_bp.route('/clientes/<int:cliente_id>/puntos', methods=['PUT'])
+@cliente_bp.route('/clientes/<string:cliente_id>/puntos', methods=['PUT'])
 def puntos(cliente_id):
     data = request.json
     resultado = actualizar_puntos(cliente_id, data.get("puntos"))
@@ -47,7 +44,7 @@ def alquilar_comprar_video():
 
 # 6. CALIFICAR VIDEO
 @cliente_bp.route('/clientes/calificar', methods=['POST'])
-def calificar():
+def calificar_endpoint():
     data = request.json
     resultado = calificar_video(data)
     return jsonify(resultado)
