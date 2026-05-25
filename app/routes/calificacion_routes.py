@@ -13,6 +13,3 @@ def nueva_calificacion():
 def ver_calificaciones(video_isan):
     resultado = obtener_calificaciones(video_isan)
     return jsonify(resultado)
-
-
-#alo alo alo
