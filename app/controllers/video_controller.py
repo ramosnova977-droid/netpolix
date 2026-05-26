@@ -1,129 +1,67 @@
-from app.config.db import get_connection
+from app.models.video import Video
+from app.models.calificacion import Calificacion
+from app.models.categoria import Categoria
 
-# LISTAR VIDEOS
-def listar_videos():
-    try:
-        conn = get_connection()
-        cur = conn.cursor()
-
-        cur.execute("""
-            SELECT 
-                v.isan,
-                v.titulo_original,
-                v.anio,
-                v.duracion,
-                c.tipo as clasificacion
-            FROM video v
-            JOIN clasificacion c ON v.clasificacion_id = c.id
-        """)
-
-        rows = cur.fetchall()
-
-        cur.close()
-        conn.close()
-
-        return [
-            {
-                "isan": r[0],
-                "titulo": r[1],
-                "anio": r[2],
-                "duracion": r[3],
-                "clasificacion": r[4]
-            }
-            for r in rows
-        ]
-
-    except Exception as e:
-        return {"error": str(e)}
-
-
-# CREAR VIDEO
-def crear_video(data):
-    if not data.get("isan") or not data.get("titulo_original"):
+def registrar_video(data):
+    if not data.get("isan") or not data.get("titulo") or not data.get("anio") or not data.get("duracion"):
         return {"error": "Campos obligatorios faltantes"}
-
-    conn = get_connection()
-    cur = conn.cursor()
-
-    cur.execute("""
-        INSERT INTO video (isan, titulo_original, anio, duracion)
-        VALUES (%s, %s, %s, %s)
-    """, (
-        data["isan"],
-        data["titulo_original"],
-        data["anio"],
-        data["duracion"]
-    ))
-
-    conn.commit()
-    cur.close()
-    conn.close()
-
-    return {"message": "Video creado"}
-
-
-# EDITAR VIDEO
-def editar_video(isan, data):
-    conn = get_connection()
-    cur = conn.cursor()
-
-    sql = """
-    UPDATE video
-    SET
-        titulo_original = %s,
-        anio = %s,
-        duracion = %s
-    WHERE isan = %s
-    """
-
-    cur.execute(sql, (
-        data["titulo_original"],
-        data["anio"],
-        data["duracion"],
-        isan
-    ))
-
-    conn.commit()
-
-    cur.close()
-    conn.close()
-
-    return True
-
-
-# ELIMINAR VIDEO
-def eliminar_video(isan):
-    conn = get_connection()
-    cur = conn.cursor()
-
-    cur.execute(
-        "DELETE FROM video WHERE isan = %s",
-        (isan,)
+    return Video.registrar(
+        data["isan"], data["titulo"], data["anio"],
+        data["duracion"], data.get("clasificacion_id")
     )
 
-    conn.commit()
+def listar_videos():
+    return Video.obtener_todos()
 
-    cur.close()
-    conn.close()
+def detalle_video(isan):
+    video = Video.obtener_por_isan(isan)
+    if "error" in video:
+        return video
+    calificaciones = Calificacion.obtener_calificaciones(isan)
+    video["calificaciones"] = calificaciones
+    return video
 
-    return True
+def registrar_serie(data):
+    if not data.get("titulo") or not data.get("temporada"):
+        return {"error": "Campos obligatorios faltantes"}
+    return Video.registrar_serie(data["titulo"], data["temporada"])
 
+def registrar_coleccion(data):
+    if not data.get("isan") or not data.get("titulo") or not data.get("volumen"):
+        return {"error": "Campos obligatorios faltantes"}
+    return Video.registrar_coleccion(data["isan"], data["titulo"], data["volumen"])
 
-# BUSCAR VIDEO
-def buscar_video(texto):
-    conn = get_connection()
-    cur = conn.cursor()
+def agregar_persona(data):
+    if not data.get("video_isan") or not data.get("nombre") or not data.get("rol"):
+        return {"error": "Campos obligatorios faltantes"}
+    roles_validos = ["actor", "productor", "director"]
+    if data["rol"] not in roles_validos:
+        return {"error": "Rol inválido. Debe ser actor, productor o director"}
+    return Video.agregar_persona(
+        data["video_isan"], data["nombre"],
+        data.get("fecha_nacimiento"), data["rol"]
+    )
 
-    cur.execute("""
-        SELECT * FROM video
-        WHERE titulo_original ILIKE %s
-    """, (f"%{texto}%",))
+def agregar_idioma(data):
+    if not data.get("video_isan") or not data.get("idioma") or not data.get("tipo"):
+        return {"error": "Campos obligatorios faltantes"}
+    tipos_validos = ["original", "subtitulo", "doblaje"]
+    if data["tipo"] not in tipos_validos:
+        return {"error": "Tipo inválido. Debe ser original, subtitulo o doblaje"}
+    return Video.agregar_idioma(data["video_isan"], data["idioma"], data["tipo"])
 
-    resultados = cur.fetchall()
+def listar_categorias():
+    return Categoria.obtener_todas()
 
-    cur.close()
-    conn.close()
+def registrar_categoria(data):
+    if not data.get("nombre"):
+        return {"error": "Nombre es obligatorio"}
+    return Categoria.registrar(data["nombre"])
 
-    return resultados
+def agregar_categoria_video(data):
+    if not data.get("video_isan") or not data.get("categoria_id"):
+        return {"error": "Campos obligatorios faltantes"}
+    return Categoria.agregar_a_video(data["video_isan"], data["categoria_id"])
 
-
+def videos_por_categoria(categoria_id):
+    return Categoria.videos_por_categoria(categoria_id)
