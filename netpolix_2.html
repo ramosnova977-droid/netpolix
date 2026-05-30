@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NETPOLIX</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --morado:#7C3AED;--morado-dark:#5B21B6;
+  --indigo:#4F46E5;--indigo-light:#818CF8;
+  --negro:#07070F;--negro2:#0D0D1A;--negro3:#131325;
+  --gris:#1E1E35;--gris2:#2A2A45;--gris-text:#8B8BB0;
+  --blanco:#ffffff;--blanco2:#D0D0E8;
+  --verde:#4ade80;
+  --grad:linear-gradient(135deg,#7C3AED,#4F46E5);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--negro);color:var(--blanco);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--negro2)}
+::-webkit-scrollbar-thumb{background:var(--gris2);border-radius:3px}
+
+/* LOGIN */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--negro);position:relative;overflow:hidden}
+.login-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(124,58,237,.2),transparent 60%),radial-gradient(ellipse at 70% 20%,rgba(79,70,229,.12),transparent 50%)}
+.login-grid{position:absolute;inset:0;opacity:.04;background-image:linear-gradient(var(--blanco) 1px,transparent 1px),linear-gradient(90deg,var(--blanco) 1px,transparent 1px);background-size:60px 60px}
+.login-box{position:relative;z-index:1;width:100%;max-width:420px;padding:0 1.5rem;animation:fadeUp .6s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.login-logo{font-family:'Bebas Neue',cursive;font-size:4rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:4px;text-align:center;margin-bottom:.2rem;filter:drop-shadow(0 0 30px rgba(124,58,237,.5))}
+.login-tag{text-align:center;color:var(--gris-text);font-size:.9rem;margin-bottom:2.5rem;letter-spacing:1px}
+.login-card{background:rgba(13,13,26,.9);border:1px solid rgba(124,58,237,.2);border-radius:16px;padding:2rem;backdrop-filter:blur(20px)}
+.login-card h2{font-size:1.3rem;font-weight:600;margin-bottom:1.5rem}
+.fg{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.2rem}
+.fg label{font-size:.75rem;font-weight:500;color:var(--gris-text);text-transform:uppercase;letter-spacing:1px}
+.fg input,.fg select{padding:.85rem 1rem;background:rgba(124,58,237,.07);border:1px solid rgba(124,58,237,.2);border-radius:8px;color:var(--blanco);font-family:'Outfit',sans-serif;font-size:.95rem;outline:none;transition:all .2s;width:100%}
+.fg input:focus,.fg select:focus{border-color:var(--morado);background:rgba(124,58,237,.13);box-shadow:0 0 0 3px rgba(124,58,237,.18)}
+.fg input::placeholder{color:rgba(255,255,255,.2)}
+.fg select option{background:var(--negro2)}
+.btn-login{width:100%;padding:.9rem;background:var(--grad);color:#fff;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s;margin-top:.5rem}
+.btn-login:hover{opacity:.88;transform:translateY(-1px);box-shadow:0 8px 25px rgba(124,58,237,.45)}
+.login-err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);color:#fca5a5;padding:.75rem 1rem;border-radius:8px;font-size:.85rem;margin-top:1rem;display:none}
+
+/* APP */
+#app-screen{display:none}
+.navbar{position:fixed;top:0;left:0;right:0;z-index:500;height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;background:linear-gradient(to bottom,rgba(7,7,15,.95),transparent);transition:background .3s}
+.navbar.scrolled{background:rgba(7,7,15,.98);border-bottom:1px solid rgba(124,58,237,.15)}
+.nav-logo{font-family:'Bebas Neue',cursive;font-size:2rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:3px;cursor:pointer}
+.nav-links{display:flex;gap:1.5rem}
+.nav-link{color:var(--blanco2);font-size:.88rem;cursor:pointer;transition:color .2s;font-weight:500}
+.nav-link:hover,.nav-link.active{color:var(--blanco)}
+.nav-right{display:flex;align-items:center;gap:1.2rem}
+.nav-user{color:var(--gris-text);font-size:.85rem}
+.nav-user strong{color:var(--blanco)}
+.btn-salir{background:var(--grad);color:#fff;border:none;padding:6px 16px;border-radius:6px;font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+.btn-salir:hover{opacity:.85}
+
+/* HERO */
+.hero{position:relative;height:85vh;min-height:500px;display:flex;align-items:flex-end;padding:0 4rem 5rem;overflow:hidden}
+.hero-bg-img{position:absolute;inset:0;background-size:cover;background-position:center top;z-index:0;transition:all 1s ease}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to right,rgba(7,7,15,.97) 30%,rgba(7,7,15,.4) 70%,rgba(7,7,15,.1) 100%),linear-gradient(to top,rgba(7,7,15,1) 0%,transparent 45%);z-index:1}
+.hero-glow{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse at 70% 50%,rgba(124,58,237,.15),transparent 55%)}
+.hero-content{position:relative;z-index:2;max-width:560px}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:var(--grad);color:#fff;font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:4px;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:1rem}
+.hero-title{font-family:'Bebas Neue',cursive;font-size:clamp(3rem,8vw,5.5rem);line-height:.95;color:var(--blanco);margin-bottom:1rem;text-shadow:0 4px 30px rgba(0,0,0,.8)}
+.hero-meta{display:flex;align-items:center;gap:1rem;margin-bottom:1rem;flex-wrap:wrap}
+.hero-year,.hero-dur{color:var(--gris-text);font-size:.9rem}
+.hero-rating{background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.35);color:var(--blanco2);font-size:.75rem;padding:2px 8px;border-radius:4px;font-weight:600}
+.hero-desc{color:var(--blanco2);font-size:.95rem;line-height:1.6;margin-bottom:1.8rem;max-width:480px}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap}
+.btn-play{display:flex;align-items:center;gap:.6rem;background:var(--blanco);color:var(--negro);border:none;padding:.8rem 1.8rem;border-radius:8px;font-family:'Outfit',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-play:hover{background:rgba(255,255,255,.88);transform:scale(1.03)}
+.btn-catalogo-hero{display:flex;align-items:center;gap:.6rem;background:rgba(124,58,237,.18);color:var(--blanco);border:1px solid rgba(124,58,237,.35);padding:.8rem 1.8rem;border-radius:8px;font-family:'Outfit',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s;backdrop-filter:blur(10px)}
+.btn-catalogo-hero:hover{background:rgba(124,58,237,.3)}
+
+/* SALDO BADGE */
+.saldo-badge{position:fixed;bottom:2rem;right:2rem;z-index:400;background:rgba(13,13,26,.95);border:1px solid rgba(124,58,237,.2);border-radius:12px;padding:.75rem 1.2rem;backdrop-filter:blur(20px);display:flex;gap:1.5rem}
+.saldo-item{text-align:center}
+.saldo-label{font-size:.65rem;color:var(--gris-text);text-transform:uppercase;letter-spacing:1px}
+.saldo-val{font-family:'Bebas Neue',cursive;font-size:1.3rem;color:var(--blanco)}
+.saldo-val.verde{color:var(--verde)}
+
+/* CONTENIDO */
+.contenido{padding:0 2rem 4rem;position:relative;z-index:2}
+.seccion{margin-bottom:3rem}
+.seccion-titulo{font-family:'Bebas Neue',cursive;font-size:1.6rem;letter-spacing:2px;color:var(--blanco);margin-bottom:1.2rem;display:flex;align-items:center;gap:.8rem}
+.seccion-titulo::after{content:'';flex:1;height:1px;background:rgba(124,58,237,.15)}
+.carrusel{display:flex;gap:.8rem;overflow-x:auto;padding-bottom:.5rem;scrollbar-width:none;-ms-overflow-style:none}
+.carrusel::-webkit-scrollbar{display:none}
+
+/* TARJETA */
+.video-card{flex-shrink:0;width:200px;border-radius:10px;overflow:hidden;cursor:pointer;transition:all .3s;position:relative;background:var(--negro3)}
+.video-card:hover{transform:scale(1.08) translateY(-4px);z-index:10;box-shadow:0 20px 40px rgba(0,0,0,.8),0 0 20px rgba(124,58,237,.2)}
+.video-poster{width:100%;height:280px;object-fit:cover;display:block}
+.video-placeholder{width:100%;height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:2.5rem;color:rgba(255,255,255,.2);letter-spacing:2px;position:relative;overflow:hidden}
+.video-num{position:absolute;bottom:8px;right:10px;font-family:'Bebas Neue',cursive;font-size:4rem;color:rgba(255,255,255,.05)}
+.video-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(7,7,15,.97) 0%,rgba(79,70,229,.08) 100%);opacity:0;transition:opacity .3s;display:flex;flex-direction:column;justify-content:flex-end;padding:1rem}
+.video-card:hover .video-overlay{opacity:1}
+.ov-titulo{font-weight:700;font-size:.88rem;margin-bottom:.3rem;line-height:1.2}
+.ov-meta{font-size:.73rem;color:var(--gris-text);margin-bottom:.8rem}
+.ov-btns{display:flex;gap:.4rem}
+.btn-comprar{background:var(--grad);color:#fff;border:none;padding:5px 10px;border-radius:5px;font-size:.72rem;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:opacity .2s}
+.btn-comprar:hover{opacity:.82}
+.btn-alquilar{background:rgba(124,58,237,.18);color:#fff;border:1px solid rgba(124,58,237,.35);padding:5px 10px;border-radius:5px;font-size:.72rem;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s}
+.btn-alquilar:hover{background:rgba(124,58,237,.32)}
+.video-bar{padding:.6rem .8rem;background:var(--negro3)}
+.video-bar-titulo{font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.video-bar-sub{font-size:.7rem;color:var(--gris-text);margin-top:2px}
+
+/* MODAL COMPRA/ALQUILER */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;display:none;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--negro2);border:1px solid rgba(124,58,237,.2);border-radius:16px;width:100%;max-width:500px;padding:2rem;animation:modalIn .3s ease both;max-height:90vh;overflow-y:auto}
+@keyframes modalIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.modal-titulo{font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:2px;margin-bottom:.3rem}
+.modal-meta{color:var(--gris-text);font-size:.85rem;margin-bottom:.8rem}
+.modal-desc{color:var(--blanco2);font-size:.88rem;line-height:1.6;margin-bottom:1.2rem;padding:.8rem;background:rgba(124,58,237,.06);border-radius:8px;border-left:3px solid var(--morado)}
+.modal-alert{padding:.75rem 1rem;border-radius:8px;font-size:.85rem;margin-bottom:1rem;display:none}
+.modal-alert.ok{background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.35);color:#4ade80;display:block}
+.modal-alert.err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);color:#fca5a5;display:block}
+.modal-opciones{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem}
+.opcion-card{background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.15);border-radius:10px;padding:1.2rem;cursor:pointer;transition:all .2s;text-align:center}
+.opcion-card:hover,.opcion-card.sel{border-color:var(--morado);background:rgba(124,58,237,.15)}
+.opcion-icon{font-size:1.8rem;margin-bottom:.5rem}
+.opcion-label{font-weight:700;font-size:.95rem;margin-bottom:.2rem}
+.opcion-precio{font-family:'Bebas Neue',cursive;font-size:1.5rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.modal-extras{margin-bottom:1.2rem}
+.modal-extras label{font-size:.75rem;color:var(--gris-text);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:.4rem}
+.modal-extras select{width:100%;padding:.7rem 1rem;background:rgba(124,58,237,.07);border:1px solid rgba(124,58,237,.2);border-radius:8px;color:var(--blanco);font-family:'Outfit',sans-serif;font-size:.9rem;outline:none}
+.modal-extras select option{background:var(--negro2)}
+.btn-confirmar{width:100%;padding:.9rem;background:var(--grad);color:#fff;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity .2s;margin-bottom:.7rem}
+.btn-confirmar:hover{opacity:.88}
+.btn-cancelar{width:100%;padding:.7rem;background:transparent;color:var(--gris-text);border:1px solid rgba(124,58,237,.15);border-radius:8px;font-family:'Outfit',sans-serif;font-size:.9rem;cursor:pointer;transition:all .2s}
+.btn-cancelar:hover{border-color:rgba(124,58,237,.4);color:var(--blanco)}
+
+/* TOAST */
+.toast{position:fixed;top:5rem;right:2rem;z-index:2000;background:rgba(13,13,26,.98);border:1px solid rgba(124,58,237,.2);border-radius:10px;padding:1rem 1.4rem;max-width:340px;transform:translateX(130%);transition:transform .4s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:flex-start;gap:.8rem;backdrop-filter:blur(20px)}
+.toast.show{transform:translateX(0)}
+.toast-icon{font-size:1.3rem;flex-shrink:0}
+.toast-titulo{font-weight:700;margin-bottom:.2rem;font-size:.88rem}
+.toast-msg{font-size:.82rem;color:var(--blanco2)}
+
+/* CATÁLOGO */
+#vista-catalogo{display:none;padding-top:5rem}
+.buscar-wrap{display:flex;gap:.8rem;margin-bottom:2rem;max-width:500px}
+.buscar-wrap input{flex:1;padding:.8rem 1.2rem;background:rgba(124,58,237,.07);border:1px solid rgba(124,58,237,.2);border-radius:8px;color:var(--blanco);font-family:'Outfit',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s}
+.buscar-wrap input:focus{border-color:var(--morado)}
+.buscar-wrap input::placeholder{color:rgba(255,255,255,.2)}
+.buscar-wrap button{background:var(--grad);color:#fff;border:none;padding:.8rem 1.5rem;border-radius:8px;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;transition:opacity .2s}
+.buscar-wrap button:hover{opacity:.88}
+.grid-videos{display:flex;flex-wrap:wrap;gap:.8rem}
+
+/* MI CUENTA */
+#vista-cuenta{display:none}
+.cuenta-panel{max-width:700px;margin:5rem auto 0;padding:2rem}
+.sec-titulo{font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:3px;margin-bottom:1.5rem}
+.cuenta-card{background:var(--negro3);border:1px solid rgba(124,58,237,.12);border-radius:14px;padding:1.8rem;margin-bottom:1.2rem}
+.cuenta-card h3{font-family:'Bebas Neue',cursive;font-size:1.3rem;letter-spacing:2px;margin-bottom:1.2rem;color:var(--gris-text)}
+.dato-row{display:flex;justify-content:space-between;align-items:center;padding:.7rem 0;border-bottom:1px solid rgba(124,58,237,.07)}
+.dato-row:last-child{border-bottom:none}
+.dato-label{font-size:.82rem;color:var(--gris-text)}
+.dato-val{font-size:.9rem;font-weight:600}
+.puntos-bar-wrap{background:rgba(124,58,237,.12);border-radius:8px;height:10px;overflow:hidden;margin:.8rem 0;width:100%}
+.puntos-bar-fill{height:100%;background:var(--grad);border-radius:8px;transition:width .8s ease}
+
+/* RECARGA */
+.recarga-montos{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:1rem}
+.monto-btn{background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);border-radius:8px;padding:.7rem .5rem;text-align:center;cursor:pointer;transition:all .2s;font-family:'Bebas Neue',cursive;font-size:1.1rem;color:var(--blanco)}
+.monto-btn:hover,.monto-btn.sel{border-color:var(--morado);background:rgba(124,58,237,.2);color:#c4b5fd}
+.btn-recargar{background:var(--grad);color:#fff;border:none;padding:.85rem;width:100%;border-radius:8px;font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:opacity .2s;margin-top:.5rem}
+.btn-recargar:hover{opacity:.88}
+
+/* HISTORIAL */
+.historial-tabla{width:100%;border-collapse:collapse;font-size:.85rem}
+.historial-tabla th{text-align:left;padding:.6rem .8rem;color:var(--gris-text);font-weight:500;font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid rgba(124,58,237,.1)}
+.historial-tabla td{padding:.8rem .8rem;border-bottom:1px solid rgba(124,58,237,.05)}
+.historial-tabla tr:last-child td{border-bottom:none}
+.historial-tabla tr:hover td{background:rgba(124,58,237,.04)}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.72rem;font-weight:600}
+.badge-compra{background:rgba(124,58,237,.2);color:#c4b5fd}
+.badge-alquiler{background:rgba(79,70,229,.2);color:#a5b4fc}
+.txt-vacio{text-align:center;color:var(--gris-text);padding:2rem;font-size:.9rem}
+
+/* CALIFICACIONES */
+#vista-cal{display:none}
+.cal-section{max-width:600px;margin:5rem auto 0;padding:2rem}
+.cal-form{background:var(--negro3);border:1px solid rgba(124,58,237,.12);border-radius:14px;padding:1.8rem;margin-bottom:1.2rem}
+.cal-form h3{font-family:'Bebas Neue',cursive;font-size:1.3rem;letter-spacing:2px;margin-bottom:1.2rem;color:var(--gris-text)}
+.btn-cal{background:var(--grad);color:#fff;border:none;padding:.8rem 2rem;border-radius:8px;font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:opacity .2s}
+.btn-cal:hover{opacity:.85}
+.btn-cal-sec{background:rgba(124,58,237,.15);color:#fff;border:1px solid rgba(124,58,237,.3);padding:.8rem 2rem;border-radius:8px;font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s;margin-bottom:1rem;display:block;width:100%;text-align:center}
+.btn-cal-sec:hover{background:rgba(124,58,237,.25)}
+.cal-result{background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.15);border-radius:10px;padding:1.2rem;display:none;margin-top:1rem}
+.cal-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.2rem}
+.cal-stat{text-align:center;padding:1rem;background:rgba(124,58,237,.07);border-radius:10px}
+.cal-stat-label{font-size:.7rem;color:var(--gris-text);text-transform:uppercase;letter-spacing:1px;margin-bottom:.4rem}
+.cal-stat-val{font-family:'Bebas Neue',cursive;font-size:1.8rem;color:var(--blanco)}
+
+@media(max-width:768px){
+  .hero{padding:0 1.5rem 3rem}
+  .contenido{padding:0 1rem 3rem}
+  .navbar{padding:0 1rem}
+  .nav-links{display:none}
+  .video-card{width:150px}
+  .video-poster,.video-placeholder{height:210px}
+  .saldo-badge{bottom:1rem;right:1rem;padding:.5rem .8rem}
+  .cuenta-panel,.cal-section{padding:1rem;margin-top:4.5rem}
+  .recarga-montos{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-bg"></div>
+  <div class="login-grid"></div>
+  <div class="login-box">
+    <div class="login-logo">NETPOLIX</div>
+    <div class="login-tag">Tu cine, en cualquier momento</div>
+    <div class="login-card">
+      <h2>Iniciar sesión</h2>
+      <div class="fg">
+        <label>ID de cliente (UUID)</label>
+        <input id="l-id" placeholder="Ingresa tu ID de cliente...">
+      </div>
+      <button class="btn-login" onclick="iniciarSesion()">▶ Entrar</button>
+      <div id="login-err" class="login-err">Cliente no encontrado. Verifica tu ID.</div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-screen">
+  <nav class="navbar" id="navbar">
+    <div class="nav-logo" onclick="irInicio()">NETPOLIX</div>
+    <div class="nav-links">
+      <span class="nav-link active" onclick="irInicio(this)">Inicio</span>
+      <span class="nav-link" onclick="irCatalogo(this)">Catálogo</span>
+      <span class="nav-link" onclick="irCuenta(this)">Mi cuenta</span>
+      <span class="nav-link" onclick="irCal(this)">Calificaciones</span>
+    </div>
+    <div class="nav-right">
+      <span class="nav-user">Hola, <strong id="nav-nombre">-</strong></span>
+      <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+    </div>
+  </nav>
+
+  <div class="toast" id="toast">
+    <div class="toast-icon" id="toast-icon">✓</div>
+    <div><div class="toast-titulo" id="toast-titulo"></div><div class="toast-msg" id="toast-msg"></div></div>
+  </div>
+
+  <div class="saldo-badge">
+    <div class="saldo-item"><div class="saldo-label">Saldo</div><div class="saldo-val verde" id="badge-saldo">$0</div></div>
+    <div class="saldo-item"><div class="saldo-label">Puntos</div><div class="saldo-val" id="badge-puntos">0/20</div></div>
+  </div>
+
+  <!-- INICIO -->
+  <div id="vista-inicio">
+    <div class="hero">
+      <div class="hero-bg-img" id="hero-bg"></div>
+      <div class="hero-glow"></div>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <div class="hero-badge">⭐ Destacado</div>
+        <div class="hero-title" id="hero-titulo">NETPOLIX</div>
+        <div class="hero-meta">
+          <span class="hero-year" id="hero-anio"></span>
+          <span class="hero-dur" id="hero-dur"></span>
+          <span class="hero-rating" id="hero-rating"></span>
+        </div>
+        <div class="hero-desc" id="hero-desc">Descubre las mejores películas disponibles.</div>
+        <div class="hero-btns">
+          <button class="btn-play" onclick="abrirModalHero()">▶ Ver opciones</button>
+          <button class="btn-catalogo-hero" onclick="irCatalogo()">🎬 Catálogo completo</button>
+        </div>
+      </div>
+    </div>
+    <div class="contenido">
+      <div id="secciones"><div class="txt-vacio">Cargando contenido...</div></div>
+    </div>
+  </div>
+
+  <!-- CATÁLOGO -->
+  <div id="vista-catalogo">
+    <div class="contenido">
+      <div class="sec-titulo">Catálogo completo</div>
+      <div class="buscar-wrap">
+        <input id="buscar-input" placeholder="Buscar por título..." onkeydown="if(event.key==='Enter')buscar()">
+        <button onclick="buscar()">Buscar</button>
+      </div>
+      <div class="grid-videos" id="grid-cat"><div class="txt-vacio">Cargando...</div></div>
+    </div>
+  </div>
+
+  <!-- MI CUENTA -->
+  <div id="vista-cuenta">
+    <div class="cuenta-panel">
+      <div class="sec-titulo">Mi cuenta</div>
+      <div class="cuenta-card">
+        <h3>Perfil</h3>
+        <div class="dato-row"><span class="dato-label">Nombre</span><span class="dato-val" id="c-nombre">-</span></div>
+        <div class="dato-row"><span class="dato-label">Cédula</span><span class="dato-val" id="c-cedula">-</span></div>
+        <div class="dato-row"><span class="dato-label">Cliente desde</span><span class="dato-val" id="c-fecha">-</span></div>
+        <div class="dato-row"><span class="dato-label">ID</span><span class="dato-val" id="c-id" style="font-size:.72rem;color:var(--gris-text)">-</span></div>
+      </div>
+
+      <div class="cuenta-card">
+        <h3>Saldo y puntos</h3>
+        <div class="dato-row">
+          <span class="dato-label">Saldo disponible</span>
+          <span class="dato-val" style="color:var(--verde);font-family:'Bebas Neue',cursive;font-size:1.4rem" id="c-saldo">-</span>
+        </div>
+        <div class="dato-row" style="flex-direction:column;align-items:flex-start;gap:.5rem">
+          <span class="dato-label">Puntos — <strong id="c-puntos" style="color:var(--blanco)">0</strong> / 20</span>
+          <div class="puntos-bar-wrap"><div class="puntos-bar-fill" id="c-puntos-fill" style="width:0%"></div></div>
+          <span style="font-size:.78rem;color:var(--gris-text)">Acumula 20 puntos y gana un video de regalo 🎁</span>
+        </div>
+      </div>
+
+      <!-- RECARGA DE SALDO -->
+      <div class="cuenta-card">
+        <h3>💳 Recargar saldo</h3>
+        <p style="font-size:.85rem;color:var(--gris-text);margin-bottom:1rem">Selecciona un monto o ingresa uno personalizado</p>
+        <div class="recarga-montos">
+          <div class="monto-btn" onclick="selMonto(10)">$10</div>
+          <div class="monto-btn" onclick="selMonto(20)">$20</div>
+          <div class="monto-btn" onclick="selMonto(50)">$50</div>
+          <div class="monto-btn" onclick="selMonto(100)">$100</div>
+        </div>
+        <div class="fg">
+          <label>O ingresa un monto personalizado</label>
+          <input type="number" id="monto-custom" placeholder="Ej: 35" min="1" style="width:100%">
+        </div>
+        <div id="recarga-alert" class="modal-alert" style="margin-top:.5rem"></div>
+        <button class="btn-recargar" onclick="recargarSaldo()">💳 Recargar ahora</button>
+      </div>
+
+      <div class="cuenta-card">
+        <h3>Mi historial</h3>
+        <div style="overflow-x:auto">
+          <table class="historial-tabla">
+            <thead><tr><th>Video ISAN</th><th>Tipo</th><th>Fecha</th><th>Monto</th></tr></thead>
+            <tbody id="tb-historial"><tr><td colspan="4" class="txt-vacio">Cargando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALIFICACIONES -->
+  <div id="vista-cal">
+    <div class="cal-section">
+      <div class="sec-titulo">Calificaciones</div>
+      <div class="cal-form">
+        <h3>Calificar un video</h3>
+        <div class="fg" style="margin-bottom:1rem">
+          <label>ISAN del video</label>
+          <input id="cal-isan" placeholder="Ej: ISAN001">
+        </div>
+        <div class="fg" style="margin-bottom:1.2rem">
+          <label>Tu calificación</label>
+          <select id="cal-valor">
+            <option value="excelente">⭐⭐⭐⭐ Excelente</option>
+            <option value="buena">⭐⭐⭐ Buena</option>
+            <option value="regular">⭐⭐ Regular</option>
+            <option value="mala">⭐ Mala</option>
+          </select>
+        </div>
+        <button class="btn-cal" onclick="calificar()">Enviar calificación</button>
+      </div>
+      <div class="cal-form">
+        <h3>Ver calificaciones de un video</h3>
+        <div class="fg" style="margin-bottom:1rem">
+          <label>ISAN del video</label>
+          <input id="vc-isan" placeholder="Ej: ISAN001">
+        </div>
+        <button class="btn-cal-sec" onclick="verCal()">🔍 Buscar calificaciones</button>
+        <div class="cal-result" id="cal-result">
+          <div class="cal-stats">
+            <div class="cal-stat"><div class="cal-stat-label">Promedio</div><div class="cal-stat-val" id="cal-prom">-</div></div>
+            <div class="cal-stat"><div class="cal-stat-label">Resultado</div><div class="cal-stat-val" id="cal-txt" style="font-size:1rem">-</div></div>
+            <div class="cal-stat"><div class="cal-stat-label">Votos</div><div class="cal-stat-val" id="cal-votos">-</div></div>
+          </div>
+          <table class="historial-tabla">
+            <thead><tr><th>Calificación</th><th>Cantidad</th></tr></thead>
+            <tbody id="tb-cal"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL COMPRA/ALQUILER -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div id="modal-poster-wrap" style="margin:-2rem -2rem 1.2rem;height:220px;overflow:hidden;border-radius:16px 16px 0 0;position:relative">
+      <div id="modal-poster-bg" style="position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(2px) brightness(.5)"></div>
+      <img id="modal-poster-img" style="position:absolute;right:1.5rem;bottom:-20px;height:180px;border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,.8);display:none" alt="">
+    </div>
+    <div class="modal-titulo" id="modal-titulo">Video</div>
+    <div class="modal-meta" id="modal-meta"></div>
+    <div class="modal-desc" id="modal-desc" style="display:none"></div>
+    <div class="modal-alert" id="modal-alert"></div>
+    <div class="modal-opciones">
+      <div class="opcion-card sel" id="opc-compra" onclick="selOpc('compra')">
+        <div class="opcion-icon">🛒</div>
+        <div class="opcion-label">Comprar</div>
+        <div class="opcion-precio">$10</div>
+      </div>
+      <div class="opcion-card" id="opc-alquiler" onclick="selOpc('alquiler')">
+        <div class="opcion-icon">🎬</div>
+        <div class="opcion-label">Alquilar</div>
+        <div class="opcion-precio">$5</div>
+      </div>
+    </div>
+    <div class="modal-extras" id="extras-compra">
+      <label>¿Envío por DVD?</label>
+      <select id="modal-dvd">
+        <option value="false">No, solo digital</option>
+        <option value="true">Sí, enviar DVD (+$2)</option>
+      </select>
+    </div>
+    <div class="modal-extras" id="extras-alquiler" style="display:none">
+      <label>Tipo de alquiler</label>
+      <select id="modal-tipo">
+        <option value="tiempo">Por tiempo (48 horas)</option>
+        <option value="reproducciones">Por reproducciones (3 veces)</option>
+      </select>
+    </div>
+    <button class="btn-confirmar" onclick="confirmar()">Confirmar</button>
+    <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
+  </div>
+</div>
+
+<script>
+const API = 'http://127.0.0.1:5000';
+const TMDB_KEY = '9ae6b3425ac73330f2ca6aca98b8b8ce';
+const TMDB_IMG = 'https://image.tmdb.org/t/p/w500';
+const TMDB_BACK = 'https://image.tmdb.org/t/p/w1280';
+
+let cliente = null;
+let videosCache = [];
+let heroVideo = null;
+let opcion = 'compra';
+let videoModal = null;
+let montoSeleccionado = null;
+const posterCache = {};
+
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+document.getElementById('l-id').addEventListener('keydown', e => { if (e.key === 'Enter') iniciarSesion(); });
+
+// ===== LOGIN =====
+async function iniciarSesion() {
+  const id = document.getElementById('l-id').value.trim();
+  if (!id) return;
+  const err = document.getElementById('login-err');
+  err.style.display = 'none';
+  try {
+    const res = await fetch(API + '/clientes');
+    const json = await res.json();
+    const lista = json.data || json || [];
+    const c = lista.find(x => x.id === id);
+    if (!c) { err.style.display = 'block'; return; }
+    cliente = c;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'block';
+    actualizarUI();
+    cargarInicio();
+  } catch (e) {
+    err.textContent = 'Error de conexión con el servidor.';
+    err.style.display = 'block';
+  }
+}
+
+function cerrarSesion() {
+  cliente = null; videosCache = [];
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('l-id').value = '';
+}
+
+// ===== UI =====
+function actualizarUI() {
+  if (!cliente) return;
+  document.getElementById('nav-nombre').textContent = cliente.nombre.split(' ')[0];
+  document.getElementById('badge-saldo').textContent = '$' + Number(cliente.saldo).toLocaleString();
+  document.getElementById('badge-puntos').textContent = cliente.puntos + '/20';
+  document.getElementById('c-nombre').textContent = cliente.nombre;
+  document.getElementById('c-cedula').textContent = cliente.cedula;
+  document.getElementById('c-fecha').textContent = cliente.fecha_ingreso;
+  document.getElementById('c-id').textContent = cliente.id;
+  document.getElementById('c-saldo').textContent = '$' + Number(cliente.saldo).toLocaleString();
+  document.getElementById('c-puntos').textContent = cliente.puntos;
+  document.getElementById('c-puntos-fill').style.width = Math.min((cliente.puntos / 20) * 100, 100) + '%';
+}
+
+// ===== TMDB =====
+async function getPoster(titulo, anio) {
+  const key = titulo + '_' + anio;
+  if (posterCache[key]) return posterCache[key];
+  try {
+    // Intento 1: con año
+    let r = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(titulo)}&year=${anio}&language=es-ES`);
+    let d = await r.json();
+    let m = d.results && d.results[0];
+    // Intento 2: sin año
+    if (!m || !m.poster_path) {
+      r = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(titulo)}&language=es-ES`);
+      d = await r.json();
+      m = d.results && d.results[0];
+    }
+    if (m && m.poster_path) {
+      const data = {
+        poster: TMDB_IMG + m.poster_path,
+        backdrop: m.backdrop_path ? TMDB_BACK + m.backdrop_path : null,
+        overview: m.overview || ''
+      };
+      posterCache[key] = data;
+      return data;
+    }
+  } catch (e) {}
+  return null;
+}
+
+// ===== INICIO =====
+async function cargarInicio() {
+  mostrarVista('inicio');
+  try {
+    const res = await fetch(API + '/videos');
+    const json = await res.json();
+    videosCache = Array.isArray(json) ? json : (json.data || []);
+    if (!videosCache.length) {
+      document.getElementById('secciones').innerHTML = '<div class="txt-vacio">No hay videos disponibles</div>';
+      return;
+    }
+
+    heroVideo = videosCache[0];
+    document.getElementById('hero-titulo').textContent = heroVideo.titulo;
+    document.getElementById('hero-anio').textContent = '📅 ' + heroVideo.anio;
+    document.getElementById('hero-dur').textContent = '⏱ ' + heroVideo.duracion + ' min';
+    document.getElementById('hero-rating').textContent = heroVideo.clasificacion || 'General';
+
+    getPoster(heroVideo.titulo, heroVideo.anio).then(data => {
+      if (data) {
+        if (data.backdrop) document.getElementById('hero-bg').style.backgroundImage = `url('${data.backdrop}')`;
+        if (data.overview) document.getElementById('hero-desc').textContent = data.overview;
+      }
+    });
+
+    // FIX: cada sección usa IDs únicos para no duplicar posters
+    const recientes = videosCache.filter(v => v.anio >= 2010);
+    const clasicos = videosCache.filter(v => v.anio < 2010);
+    let html = seccionHTML('🎬 Todo el catálogo', videosCache, 'todos');
+    if (recientes.length) html += seccionHTML('🔥 Estrenos recientes', recientes, 'rec');
+    if (clasicos.length) html += seccionHTML('⭐ Clásicos', clasicos, 'clas');
+    document.getElementById('secciones').innerHTML = html;
+
+    // Cargar todos los posters (sin importar sección)
+    videosCache.forEach(v => {
+      ['todos', 'rec', 'clas'].forEach(sec => ponerPoster(v, sec));
+    });
+  } catch (e) {
+    document.getElementById('secciones').innerHTML = '<div class="txt-vacio">Error al conectar. Asegúrate de que el servidor corre en http://127.0.0.1:5000</div>';
+  }
+}
+
+function seccionHTML(titulo, videos, sec) {
+  return `<div class="seccion">
+    <div class="seccion-titulo">${titulo}</div>
+    <div class="carrusel">${videos.map((v, i) => cardHTML(v, i, sec)).join('')}</div>
+  </div>`;
+}
+
+// FIX: cada tarjeta tiene ID único con prefijo de sección
+function cardHTML(v, i, sec) {
+  const colores = ['#0d0d2e','#130d2e','#0d1330','#160d2e','#0d1a2e','#1a0d30'];
+  const bg = colores[i % colores.length];
+  const ini = (v.titulo || '??').substring(0, 2).toUpperCase();
+  const uid = sec + '_' + v.isan;
+  return `<div class="video-card" onclick="abrirModalConDetalle('${v.isan}','${esc(v.titulo)}','${v.anio}','${v.duracion}')">
+    <div class="video-placeholder" id="poster-${uid}" style="background:linear-gradient(135deg,${bg},#07070f)">
+      ${ini}
+      <div class="video-num">${String(i + 1).padStart(2, '0')}</div>
+    </div>
+    <div class="video-overlay">
+      <div class="ov-titulo">${v.titulo}</div>
+      <div class="ov-meta">${v.anio} · ${v.duracion} min</div>
+      <div class="ov-btns">
+        <button class="btn-comprar" onclick="event.stopPropagation();abrirModalConDetalle('${v.isan}','${esc(v.titulo)}','${v.anio}','${v.duracion}','compra')">Comprar $10</button>
+        <button class="btn-alquilar" onclick="event.stopPropagation();abrirModalConDetalle('${v.isan}','${esc(v.titulo)}','${v.anio}','${v.duracion}','alquiler')">Alquilar $5</button>
+      </div>
+    </div>
+    <div class="video-bar">
+      <div class="video-bar-titulo">${v.titulo}</div>
+      <div class="video-bar-sub">${v.anio} · ${v.duracion} min</div>
+    </div>
+  </div>`;
+}
+
+function esc(s) { return (s || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+
+async function ponerPoster(v, sec) {
+  const uid = sec + '_' + v.isan;
+  const el = document.getElementById('poster-' + uid);
+  if (!el) return;
+  const data = await getPoster(v.titulo, v.anio);
+  if (!data) return;
+  el.innerHTML = `<img class="video-poster" src="${data.poster}" alt="${v.titulo}" loading="lazy" onerror="this.parentElement.innerHTML='${(v.titulo||'').substring(0,2).toUpperCase()}'">`;
+  el.style.background = 'none';
+  el.style.padding = '0';
+}
+
+// ===== CATÁLOGO =====
+async function irCatalogo(el) {
+  setActive(el); mostrarVista('catalogo');
+  const grid = document.getElementById('grid-cat');
+  const videos = videosCache.length ? videosCache : await fetchVideos();
+  grid.innerHTML = videos.map((v, i) => cardHTML(v, i, 'cat')).join('');
+  videos.forEach(v => ponerPoster(v, 'cat'));
+}
+
+async function fetchVideos() {
+  try {
+    const res = await fetch(API + '/videos');
+    const json = await res.json();
+    videosCache = Array.isArray(json) ? json : (json.data || []);
+    return videosCache;
+  } catch (e) { return []; }
+}
+
+async function buscar() {
+  const q = document.getElementById('buscar-input').value.trim().toLowerCase();
+  const grid = document.getElementById('grid-cat');
+  const base = videosCache.length ? videosCache : await fetchVideos();
+  if (!q) {
+    grid.innerHTML = base.map((v, i) => cardHTML(v, i, 'cat')).join('');
+    base.forEach(v => ponerPoster(v, 'cat'));
+    return;
+  }
+  const res = base.filter(v => v.titulo.toLowerCase().includes(q) || String(v.anio).includes(q));
+  if (!res.length) { grid.innerHTML = `<div class="txt-vacio">Sin resultados para "${q}"</div>`; return; }
+  grid.innerHTML = res.map((v, i) => cardHTML(v, i, 'cat')).join('');
+  res.forEach(v => ponerPoster(v, 'cat'));
+}
+
+// ===== MI CUENTA =====
+function irCuenta(el) { setActive(el); mostrarVista('cuenta'); actualizarUI(); cargarHistorial(); }
+
+async function cargarHistorial() {
+  const tbody = document.getElementById('tb-historial');
+  try {
+    const res = await fetch(API + '/clientes/' + cliente.id + '/historial');
+    const json = await res.json();
+    const data = json.data || json || [];
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="4" class="txt-vacio">Sin transacciones aún</td></tr>'; return; }
+    tbody.innerHTML = data.map(h => `<tr>
+      <td>${h.video_isan}</td>
+      <td><span class="badge ${h.tipo === 'compra' ? 'badge-compra' : 'badge-alquiler'}">${h.tipo}</span></td>
+      <td>${h.fecha || '-'}</td>
+      <td>$${h.monto}</td>
+    </tr>`).join('');
+  } catch (e) { tbody.innerHTML = '<tr><td colspan="4" class="txt-vacio">Error al cargar historial</td></tr>'; }
+}
+
+// ===== RECARGA =====
+function selMonto(m) {
+  montoSeleccionado = m;
+  document.getElementById('monto-custom').value = '';
+  document.querySelectorAll('.monto-btn').forEach(b => b.classList.remove('sel'));
+  event.target.classList.add('sel');
+}
+
+async function recargarSaldo() {
+  const customVal = document.getElementById('monto-custom').value;
+  const monto = customVal ? parseFloat(customVal) : montoSeleccionado;
+  const alerta = document.getElementById('recarga-alert');
+  alerta.className = 'modal-alert';
+
+  if (!monto || monto <= 0) {
+    alerta.textContent = 'Selecciona o ingresa un monto válido';
+    alerta.className = 'modal-alert err';
+    return;
+  }
+  try {
+    const res = await fetch(API + '/clientes/pagar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cliente_id: cliente.id, monto })
+    });
+    const json = await res.json();
+    if (json.error) {
+      alerta.textContent = json.error;
+      alerta.className = 'modal-alert err';
+      return;
+    }
+    cliente.saldo = json.saldo_actual;
+    actualizarUI();
+    alerta.textContent = '✅ ¡Recarga exitosa! Nuevo saldo: $' + Number(json.saldo_actual).toLocaleString();
+    alerta.className = 'modal-alert ok';
+    montoSeleccionado = null;
+    document.getElementById('monto-custom').value = '';
+    document.querySelectorAll('.monto-btn').forEach(b => b.classList.remove('sel'));
+    toast('💳', '¡Recarga exitosa!', 'Se añadieron $' + monto + ' a tu cuenta');
+  } catch (e) {
+    alerta.textContent = 'Error de conexión con el servidor';
+    alerta.className = 'modal-alert err';
+  }
+}
+
+// ===== CALIFICACIONES =====
+function irCal(el) { setActive(el); mostrarVista('cal'); }
+
+async function calificar() {
+  const isan = document.getElementById('cal-isan').value.trim();
+  const valor = document.getElementById('cal-valor').value;
+  if (!isan) return toast('⚠️', 'Campo requerido', 'Ingresa el ISAN del video');
+  try {
+    const res = await fetch(API + '/calificaciones', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cliente_id: cliente.id, video_isan: isan, valor })
+    });
+    const json = await res.json();
+    if (json.error) return toast('❌', 'Error', json.error);
+    toast('⭐', '¡Calificación enviada!', 'Gracias por tu opinión');
+    document.getElementById('cal-isan').value = '';
+  } catch (e) { toast('❌', 'Error', 'Sin conexión al servidor'); }
+}
+
+async function verCal() {
+  const isan = document.getElementById('vc-isan').value.trim();
+  if (!isan) return;
+  try {
+    const res = await fetch(API + '/calificaciones/' + isan);
+    const json = await res.json();
+    if (json.error) { toast('❌', 'Error', json.error); return; }
+    document.getElementById('cal-result').style.display = 'block';
+    document.getElementById('cal-prom').textContent = json.promedio || '-';
+    document.getElementById('cal-txt').textContent = json.promedio_texto || '-';
+    document.getElementById('cal-votos').textContent = json.total_votos || 0;
+    document.getElementById('tb-cal').innerHTML = Object.entries(json.conteo || {})
+      .map(([k, v]) => `<tr><td>${k}</td><td><strong>${v}</strong></td></tr>`).join('');
+  } catch (e) { toast('❌', 'Error', 'Sin conexión al servidor'); }
+}
+
+// ===== MODAL CON DESCRIPCIÓN TMDB =====
+async function abrirModalConDetalle(isan, titulo, anio, duracion, tipoPresel) {
+  videoModal = { isan, titulo, anio, duracion };
+
+  // Reset modal
+  document.getElementById('modal-titulo').textContent = titulo;
+  document.getElementById('modal-meta').textContent = (anio || '') + (duracion ? ' · ' + duracion + ' min' : '');
+  document.getElementById('modal-desc').style.display = 'none';
+  document.getElementById('modal-alert').className = 'modal-alert';
+  document.getElementById('modal-poster-img').style.display = 'none';
+  document.getElementById('modal-poster-bg').style.backgroundImage = '';
+  selOpc(tipoPresel || 'compra');
+  document.getElementById('modal-overlay').classList.add('open');
+
+  // Cargar datos TMDB en el modal
+  const data = await getPoster(titulo, anio);
+  if (data) {
+    if (data.backdrop) {
+      document.getElementById('modal-poster-bg').style.backgroundImage = `url('${data.backdrop}')`;
+    }
+    if (data.poster) {
+      const img = document.getElementById('modal-poster-img');
+      img.src = data.poster;
+      img.style.display = 'block';
+    }
+    if (data.overview) {
+      const desc = document.getElementById('modal-desc');
+      desc.textContent = data.overview;
+      desc.style.display = 'block';
+    }
+  }
+}
+
+function abrirModalHero() {
+  if (heroVideo) abrirModalConDetalle(heroVideo.isan, heroVideo.titulo, heroVideo.anio, heroVideo.duracion);
+}
+
+function cerrarModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) cerrarModal();
+});
+
+function selOpc(tipo) {
+  opcion = tipo;
+  document.getElementById('opc-compra').classList.toggle('sel', tipo === 'compra');
+  document.getElementById('opc-alquiler').classList.toggle('sel', tipo === 'alquiler');
+  document.getElementById('extras-compra').style.display = tipo === 'compra' ? 'block' : 'none';
+  document.getElementById('extras-alquiler').style.display = tipo === 'alquiler' ? 'block' : 'none';
+}
+
+async function confirmar() {
+  if (!videoModal || !cliente) return;
+  const al = document.getElementById('modal-alert');
+  al.className = 'modal-alert';
+  try {
+    let res;
+    if (opcion === 'compra') {
+      res = await fetch(API + '/ventas/comprar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cliente_id: cliente.id,
+          video_isan: videoModal.isan,
+          envio_dvd: document.getElementById('modal-dvd').value === 'true'
+        })
+      });
+    } else {
+      res = await fetch(API + '/ventas/alquilar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cliente_id: cliente.id,
+          video_isan: videoModal.isan,
+          tipo_alquiler: document.getElementById('modal-tipo').value
+        })
+      });
+    }
+    const json = await res.json();
+    if (json.error) {
+      al.textContent = json.error;
+      al.className = 'modal-alert err';
+      return;
+    }
+    cliente.puntos = json.puntos;
+    cliente.saldo -= opcion === 'compra' ? 10 : 5;
+    actualizarUI();
+    cerrarModal();
+    let msg = videoModal.titulo + ' · Puntos: ' + json.puntos;
+    if (json.video_regalo) msg += ' · 🎁 ¡Video de regalo desbloqueado!';
+    toast(opcion === 'compra' ? '🛒' : '🎬', opcion === 'compra' ? '¡Compra exitosa!' : '¡Alquiler exitoso!', msg);
+  } catch (e) {
+    al.textContent = 'Error de conexión con el servidor';
+    al.className = 'modal-alert err';
+  }
+}
+
+// ===== HELPERS =====
+function irInicio(el) {
+  setActive(el); mostrarVista('inicio');
+  if (!videosCache.length) cargarInicio();
+}
+
+function mostrarVista(n) {
+  ['inicio','catalogo','cuenta','cal'].forEach(v => {
+    document.getElementById('vista-' + v).style.display = v === n ? 'block' : 'none';
+  });
+  window.scrollTo(0, 0);
+}
+
+function setActive(el) {
+  document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+  if (el && el.classList) el.classList.add('active');
+}
+
+function toast(icon, titulo, msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-icon').textContent = icon;
+  document.getElementById('toast-titulo').textContent = titulo;
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 4500);
+}
+</script>
+</body>
+</html>
