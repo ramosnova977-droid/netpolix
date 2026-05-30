@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<!-- saved from url=(0043)file:///C:/Users/angie/Downloads/admin.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NETPOLIX — Panel Gerente</title>
+<link href="./admin_files/css2" rel="stylesheet">
+<script src="./admin_files/chart.umd.min.js.download"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --morado:#7C3AED;--indigo:#4F46E5;
+  --negro:#07070F;--negro2:#0D0D1A;--negro3:#131325;
+  --gris:#1E1E35;--gris2:#2A2A45;--gris-text:#8B8BB0;
+  --blanco:#fff;--blanco2:#D0D0E8;
+  --verde:#4ade80;--amarillo:#fbbf24;--rojo:#f87171;--azul:#60a5fa;
+  --grad:linear-gradient(135deg,#7C3AED,#4F46E5);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--negro);color:var(--blanco);min-height:100vh}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--negro2)}
+::-webkit-scrollbar-thumb{background:var(--gris2);border-radius:3px}
+
+/* LOGIN ADMIN */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--negro);position:relative;overflow:hidden}
+.login-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(124,58,237,.2),transparent 60%),radial-gradient(ellipse at 70% 20%,rgba(79,70,229,.12),transparent 50%)}
+.login-grid{position:absolute;inset:0;opacity:.04;background-image:linear-gradient(var(--blanco) 1px,transparent 1px),linear-gradient(90deg,var(--blanco) 1px,transparent 1px);background-size:60px 60px}
+.login-box{position:relative;z-index:1;width:100%;max-width:420px;padding:0 1.5rem;animation:fadeUp .6s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.login-logo{font-family:'Bebas Neue',cursive;font-size:3.5rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:4px;text-align:center;margin-bottom:.2rem}
+.login-tag{text-align:center;color:var(--gris-text);font-size:.85rem;margin-bottom:2rem;letter-spacing:1px}
+.admin-badge{display:flex;align-items:center;justify-content:center;gap:.5rem;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.3);border-radius:8px;padding:.6rem;margin-bottom:1.5rem;color:#c4b5fd;font-size:.85rem;font-weight:600}
+.login-card{background:rgba(13,13,26,.9);border:1px solid rgba(124,58,237,.2);border-radius:16px;padding:2rem;backdrop-filter:blur(20px)}
+.login-card h2{font-size:1.2rem;font-weight:600;margin-bottom:1.5rem}
+.fg{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.2rem}
+.fg label{font-size:.75rem;font-weight:500;color:var(--gris-text);text-transform:uppercase;letter-spacing:1px}
+.fg input{padding:.85rem 1rem;background:rgba(124,58,237,.07);border:1px solid rgba(124,58,237,.2);border-radius:8px;color:var(--blanco);font-family:'Outfit',sans-serif;font-size:.95rem;outline:none;transition:all .2s;width:100%}
+.fg input:focus{border-color:var(--morado);box-shadow:0 0 0 3px rgba(124,58,237,.18)}
+.fg input::placeholder{color:rgba(255,255,255,.2)}
+.btn-login{width:100%;padding:.9rem;background:var(--grad);color:#fff;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s;margin-top:.5rem}
+.btn-login:hover{opacity:.88;transform:translateY(-1px)}
+.login-err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);color:#fca5a5;padding:.75rem 1rem;border-radius:8px;font-size:.85rem;margin-top:1rem;display:none}
+.login-hint{text-align:center;color:var(--gris-text);font-size:.78rem;margin-top:1rem}
+.login-hint strong{color:#c4b5fd}
+
+/* APP */
+#app-screen{display:none;min-height:100vh}
+
+/* SIDEBAR */
+.layout{display:flex;min-height:100vh}
+.sidebar{width:240px;background:var(--negro2);border-right:1px solid rgba(124,58,237,.12);padding:1.5rem 0;position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;z-index:100}
+.sidebar-logo{font-family:'Bebas Neue',cursive;font-size:1.8rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:3px;padding:0 1.5rem;margin-bottom:.3rem}
+.sidebar-sub{font-size:.7rem;color:var(--gris-text);padding:0 1.5rem;margin-bottom:2rem;text-transform:uppercase;letter-spacing:1px}
+.sidebar-nav{flex:1;display:flex;flex-direction:column;gap:.3rem;padding:0 .8rem}
+.nav-item{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;border-radius:8px;cursor:pointer;transition:all .2s;color:var(--gris-text);font-size:.9rem;font-weight:500}
+.nav-item:hover{background:rgba(124,58,237,.1);color:var(--blanco)}
+.nav-item.active{background:rgba(124,58,237,.18);color:var(--blanco);border:1px solid rgba(124,58,237,.2)}
+.nav-icon{font-size:1.1rem;width:20px;text-align:center}
+.sidebar-bottom{padding:1rem 1.5rem;border-top:1px solid rgba(124,58,237,.1);margin-top:auto}
+.gerente-info{display:flex;align-items:center;gap:.75rem;margin-bottom:.8rem}
+.gerente-avatar{width:36px;height:36px;background:var(--grad);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0}
+.gerente-nombre{font-size:.85rem;font-weight:600}
+.gerente-rol{font-size:.72rem;color:var(--gris-text)}
+.btn-salir{width:100%;padding:.6rem;background:transparent;color:var(--gris-text);border:1px solid rgba(124,58,237,.15);border-radius:6px;font-family:'Outfit',sans-serif;font-size:.82rem;cursor:pointer;transition:all .2s}
+.btn-salir:hover{border-color:rgba(239,68,68,.4);color:#fca5a5}
+
+/* MAIN */
+.main{margin-left:240px;flex:1;padding:2rem;min-height:100vh}
+.page{display:none}
+.page.active{display:block}
+.page-header{margin-bottom:2rem}
+.page-titulo{font-family:'Bebas Neue',cursive;font-size:2.2rem;letter-spacing:3px;margin-bottom:.3rem}
+.page-sub{color:var(--gris-text);font-size:.88rem}
+
+/* STAT CARDS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
+.stat-card{background:var(--negro3);border:1px solid rgba(124,58,237,.12);border-radius:14px;padding:1.5rem;position:relative;overflow:hidden;transition:border-color .2s}
+.stat-card:hover{border-color:rgba(124,58,237,.3)}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad)}
+.stat-card.verde::before{background:linear-gradient(135deg,#4ade80,#22c55e)}
+.stat-card.azul::before{background:linear-gradient(135deg,#60a5fa,#3b82f6)}
+.stat-card.amarillo::before{background:linear-gradient(135deg,#fbbf24,#f59e0b)}
+.stat-card.rojo::before{background:linear-gradient(135deg,#f87171,#ef4444)}
+.stat-icon{font-size:1.8rem;margin-bottom:.8rem}
+.stat-label{font-size:.75rem;color:var(--gris-text);text-transform:uppercase;letter-spacing:1px;margin-bottom:.4rem}
+.stat-val{font-family:'Bebas Neue',cursive;font-size:2.2rem;line-height:1;color:var(--blanco)}
+.stat-val.verde{color:var(--verde)}
+.stat-val.azul{color:var(--azul)}
+.stat-val.amarillo{color:var(--amarillo)}
+.stat-sub{font-size:.75rem;color:var(--gris-text);margin-top:.3rem}
+
+/* CARDS GENERALES */
+.card{background:var(--negro3);border:1px solid rgba(124,58,237,.12);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem}
+.card-titulo{font-family:'Bebas Neue',cursive;font-size:1.2rem;letter-spacing:2px;color:var(--gris-text);margin-bottom:1.2rem;display:flex;align-items:center;gap:.6rem}
+.card-titulo::after{content:'';flex:1;height:1px;background:rgba(124,58,237,.1)}
+
+/* GRID 2 COL */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
+
+/* CHARTS */
+.chart-wrap{position:relative;height:260px}
+
+/* TABLAS */
+.tabla{width:100%;border-collapse:collapse;font-size:.85rem}
+.tabla th{text-align:left;padding:.7rem .8rem;color:var(--gris-text);font-weight:500;font-size:.73rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid rgba(124,58,237,.1)}
+.tabla td{padding:.85rem .8rem;border-bottom:1px solid rgba(124,58,237,.05)}
+.tabla tr:last-child td{border-bottom:none}
+.tabla tr:hover td{background:rgba(124,58,237,.04)}
+.rank-num{font-family:'Bebas Neue',cursive;font-size:1.3rem;color:rgba(255,255,255,.2)}
+.rank-num.top{color:#fbbf24}
+.badge-pts{display:inline-flex;align-items:center;gap:.3rem;background:rgba(124,58,237,.18);color:#c4b5fd;padding:3px 10px;border-radius:20px;font-size:.78rem;font-weight:600}
+.badge-ventas{background:rgba(74,222,128,.15);color:#4ade80;padding:3px 10px;border-radius:20px;font-size:.78rem;font-weight:600;display:inline-block}
+.badge-alq{background:rgba(96,165,250,.15);color:#60a5fa;padding:3px 10px;border-radius:20px;font-size:.78rem;font-weight:600;display:inline-block}
+.progress-bar{background:rgba(124,58,237,.1);border-radius:4px;height:6px;overflow:hidden;margin-top:.3rem}
+.progress-fill{height:100%;border-radius:4px;transition:width .8s ease}
+.fill-morado{background:var(--grad)}
+.fill-verde{background:linear-gradient(135deg,#4ade80,#22c55e)}
+.fill-azul{background:linear-gradient(135deg,#60a5fa,#3b82f6)}
+
+/* VIDEOS PAGE */
+.videos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
+.video-admin-card{background:var(--negro3);border:1px solid rgba(124,58,237,.1);border-radius:12px;padding:1.2rem;display:flex;gap:1rem;align-items:flex-start;transition:border-color .2s}
+.video-admin-card:hover{border-color:rgba(124,58,237,.3)}
+.video-thumb{width:60px;height:80px;border-radius:6px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:1.2rem;color:rgba(255,255,255,.5);flex-shrink:0;overflow:hidden}
+.video-thumb img{width:100%;height:100%;object-fit:cover}
+.video-info{flex:1;min-width:0}
+.video-admin-titulo{font-weight:700;font-size:.9rem;margin-bottom:.3rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.video-admin-meta{font-size:.75rem;color:var(--gris-text);margin-bottom:.5rem}
+.video-tags{display:flex;gap:.3rem;flex-wrap:wrap}
+.tag{font-size:.68rem;padding:2px 7px;border-radius:4px;font-weight:600}
+.tag-isan{background:rgba(124,58,237,.2);color:#c4b5fd}
+.tag-dur{background:rgba(96,165,250,.15);color:#93c5fd}
+.tag-cls{background:rgba(251,191,36,.15);color:#fcd34d}
+
+/* CLIENTES PAGE */
+.cliente-row{display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--negro3);border:1px solid rgba(124,58,237,.08);border-radius:10px;margin-bottom:.6rem;transition:border-color .2s}
+.cliente-row:hover{border-color:rgba(124,58,237,.25)}
+.cliente-avatar{width:40px;height:40px;background:var(--grad);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0}
+.cliente-datos{flex:1}
+.cliente-nombre{font-weight:600;font-size:.9rem}
+.cliente-cedula{font-size:.75rem;color:var(--gris-text)}
+.cliente-saldo{font-family:'Bebas Neue',cursive;font-size:1.2rem;color:var(--verde)}
+.cliente-puntos-wrap{text-align:right}
+.cliente-puntos-num{font-family:'Bebas Neue',cursive;font-size:1.4rem;color:#c4b5fd}
+.cliente-puntos-label{font-size:.65rem;color:var(--gris-text);text-transform:uppercase;letter-spacing:1px}
+
+/* LOADING */
+.loading{display:flex;align-items:center;justify-content:center;padding:3rem;color:var(--gris-text);font-size:.9rem;gap:.8rem}
+.spinner{width:20px;height:20px;border:2px solid rgba(124,58,237,.2);border-top-color:var(--morado);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.txt-vacio{text-align:center;color:var(--gris-text);padding:2rem;font-size:.9rem}
+
+/* TOAST */
+.toast{position:fixed;top:2rem;right:2rem;z-index:2000;background:rgba(13,13,26,.98);border:1px solid rgba(124,58,237,.2);border-radius:10px;padding:1rem 1.4rem;max-width:340px;transform:translateX(130%);transition:transform .4s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:flex-start;gap:.8rem;backdrop-filter:blur(20px)}
+.toast.show{transform:translateX(0)}
+.toast-icon{font-size:1.3rem;flex-shrink:0}
+.toast-titulo{font-weight:700;font-size:.88rem;margin-bottom:.2rem}
+.toast-msg{font-size:.82rem;color:var(--blanco2)}
+
+/* REFRESH BTN */
+.btn-refresh{background:rgba(124,58,237,.15);color:#c4b5fd;border:1px solid rgba(124,58,237,.25);padding:.5rem 1rem;border-radius:6px;font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:.4rem}
+.btn-refresh:hover{background:rgba(124,58,237,.28)}
+.btn-refresh.loading-btn{opacity:.6;pointer-events:none}
+
+@media(max-width:900px){
+  .sidebar{width:60px;padding:.8rem 0}
+  .sidebar-logo{font-size:1.1rem;padding:0 .5rem;letter-spacing:0}
+  .sidebar-sub,.gerente-info,.nav-item span,.sidebar-sub{display:none}
+  .nav-item{justify-content:center;padding:.75rem}
+  .nav-icon{width:auto}
+  .main{margin-left:60px}
+  .grid-2{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-bg"></div>
+  <div class="login-grid"></div>
+  <div class="login-box">
+    <div class="login-logo">NETPOLIX</div>
+    <div class="login-tag">Panel de administración</div>
+    <div class="admin-badge">🔐 Acceso restringido — Solo gerentes</div>
+    <div class="login-card">
+      <h2>Iniciar sesión</h2>
+      <div class="fg">
+        <label>Usuario</label>
+        <input id="l-user" placeholder="Ingresa tu usuario..." autocomplete="off">
+      </div>
+      <div class="fg">
+        <label>Contraseña</label>
+        <input id="l-pass" type="password" placeholder="Ingresa tu contraseña...">
+      </div>
+      <button class="btn-login" onclick="loginAdmin()">🔐 Ingresar al panel</button>
+      <div id="login-err" class="login-err">Usuario o contraseña incorrectos.</div>
+      <div class="login-hint">Usuario: <strong>admin</strong> · Contraseña: <strong>netpolix2024</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP ADMIN -->
+<div id="app-screen">
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">NETPOLIX</div>
+      <div class="sidebar-sub">Panel Gerente</div>
+      <nav class="sidebar-nav">
+        <div class="nav-item active" onclick="irPagina(&#39;dashboard&#39;, this)">
+          <span class="nav-icon">📊</span><span>Dashboard</span>
+        </div>
+        <div class="nav-item" onclick="irPagina(&#39;videos&#39;, this)">
+          <span class="nav-icon">🎬</span><span>Videos</span>
+        </div>
+        <div class="nav-item" onclick="irPagina(&#39;clientes&#39;, this)">
+          <span class="nav-icon">👥</span><span>Clientes</span>
+        </div>
+        <div class="nav-item" onclick="irPagina(&#39;ranking&#39;, this)">
+          <span class="nav-icon">🏆</span><span>Rankings</span>
+        </div>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="gerente-info">
+          <div class="gerente-avatar">G</div>
+          <div>
+            <div class="gerente-nombre">Gerente</div>
+            <div class="gerente-rol">Administrador</div>
+          </div>
+        </div>
+        <button class="btn-salir" onclick="cerrarSesion()">← Cerrar sesión</button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- TOAST -->
+      <div class="toast" id="toast">
+        <div class="toast-icon" id="toast-icon">✓</div>
+        <div><div class="toast-titulo" id="toast-titulo"></div><div class="toast-msg" id="toast-msg"></div></div>
+      </div>
+
+      <!-- ===== DASHBOARD ===== -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div class="page-titulo">Dashboard</div>
+              <div class="page-sub">Resumen general de la plataforma</div>
+            </div>
+            <button class="btn-refresh" id="btn-refresh-dash" onclick="cargarDashboard()">↻ Actualizar</button>
+          </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="stats-grid" id="kpis">
+          <div class="loading"><div class="spinner"></div> Cargando...</div>
+        </div>
+
+        <!-- Gráficas -->
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-titulo">📈 Ventas vs Alquileres</div>
+            <div class="chart-wrap"><canvas id="chart-ventas-alq"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-titulo">💰 Ingresos por fuente</div>
+            <div class="chart-wrap"><canvas id="chart-ingresos"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Top mas vendidos dashboard -->
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-titulo">🔥 Videos más vendidos</div>
+            <div id="top-vendidos-dash"><div class="loading"><div class="spinner"></div></div></div>
+          </div>
+          <div class="card">
+            <div class="card-titulo">🎬 Videos más alquilados</div>
+            <div id="top-alquilados-dash"><div class="loading"><div class="spinner"></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== VIDEOS ===== -->
+      <div class="page" id="page-videos">
+        <div class="page-header">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div class="page-titulo">Catálogo de videos</div>
+              <div class="page-sub" id="videos-count">Cargando...</div>
+            </div>
+            <button class="btn-refresh" onclick="cargarVideos()">↻ Actualizar</button>
+          </div>
+        </div>
+        <div class="videos-grid" id="videos-grid">
+          <div class="loading"><div class="spinner"></div> Cargando videos...</div>
+        </div>
+      </div>
+
+      <!-- ===== CLIENTES ===== -->
+      <div class="page" id="page-clientes">
+        <div class="page-header">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div class="page-titulo">Clientes registrados</div>
+              <div class="page-sub" id="clientes-count">Cargando...</div>
+            </div>
+            <button class="btn-refresh" onclick="cargarClientes()">↻ Actualizar</button>
+          </div>
+        </div>
+        <div id="clientes-lista">
+          <div class="loading"><div class="spinner"></div> Cargando clientes...</div>
+        </div>
+      </div>
+
+      <!-- ===== RANKING ===== -->
+      <div class="page" id="page-ranking">
+        <div class="page-header">
+          <div class="page-titulo">Rankings</div>
+          <div class="page-sub">Top clientes y videos más populares</div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-titulo">🏆 Top clientes por puntos</div>
+            <div id="ranking-clientes"><div class="loading"><div class="spinner"></div></div></div>
+          </div>
+          <div class="card">
+            <div class="card-titulo">💰 Top clientes por saldo</div>
+            <div id="ranking-saldo"><div class="loading"><div class="spinner"></div></div></div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-titulo">🔥 Videos más comprados</div>
+            <div id="ranking-vendidos"><div class="loading"><div class="spinner"></div></div></div>
+          </div>
+          <div class="card">
+            <div class="card-titulo">🎬 Videos más alquilados</div>
+            <div id="ranking-alquilados"><div class="loading"><div class="spinner"></div></div></div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+const API = 'http://127.0.0.1:5000';
+const TMDB_KEY = '9ae6b3425ac73330f2ca6aca98b8b8ce';
+const TMDB_IMG = 'https://image.tmdb.org/t/p/w200';
+
+// Credenciales hardcodeadas (sin tabla en DB)
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'netpolix2024';
+
+let videosCache = [];
+let clientesCache = [];
+let charts = {};
+
+// Enter en login
+document.getElementById('l-user').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('l-pass').focus(); });
+document.getElementById('l-pass').addEventListener('keydown', e => { if (e.key === 'Enter') loginAdmin(); });
+
+// ===== LOGIN =====
+function loginAdmin() {
+  const user = document.getElementById('l-user').value.trim();
+  const pass = document.getElementById('l-pass').value;
+  const err = document.getElementById('login-err');
+  if (user === ADMIN_USER && pass === ADMIN_PASS) {
+    err.style.display = 'none';
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'block';
+    cargarTodo();
+  } else {
+    err.style.display = 'block';
+  }
+}
+
+function cerrarSesion() {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('l-user').value = '';
+  document.getElementById('l-pass').value = '';
+  // Destruir charts
+  Object.values(charts).forEach(c => c && c.destroy && c.destroy());
+  charts = {};
+}
+
+// ===== CARGA INICIAL =====
+async function cargarTodo() {
+  await Promise.all([cargarDashboard(), cargarVideos(), cargarClientes(), cargarRanking()]);
+}
+
+// ===== DASHBOARD =====
+async function cargarDashboard() {
+  const btn = document.getElementById('btn-refresh-dash');
+  btn.classList.add('loading-btn');
+  try {
+    const [resumen, masVendidos] = await Promise.all([
+      fetch(API + '/gerente/resumen').then(r => r.json()),
+      fetch(API + '/gerente/mas-vendidos').then(r => r.json())
+    ]);
+
+    if (resumen.error) throw new Error(resumen.error);
+
+    // KPIs
+    document.getElementById('kpis').innerHTML = `
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-label">Clientes</div>
+        <div class="stat-val">${resumen.total_clientes}</div>
+        <div class="stat-sub">registrados en la plataforma</div>
+      </div>
+      <div class="stat-card azul">
+        <div class="stat-icon">🎬</div>
+        <div class="stat-label">Videos</div>
+        <div class="stat-val azul">${resumen.total_videos}</div>
+        <div class="stat-sub">en el catálogo</div>
+      </div>
+      <div class="stat-card verde">
+        <div class="stat-icon">🛒</div>
+        <div class="stat-label">Ventas</div>
+        <div class="stat-val verde">${resumen.total_ventas}</div>
+        <div class="stat-sub">compras realizadas</div>
+      </div>
+      <div class="stat-card amarillo">
+        <div class="stat-icon">📼</div>
+        <div class="stat-label">Alquileres</div>
+        <div class="stat-val amarillo">${resumen.total_alquileres}</div>
+        <div class="stat-sub">alquileres realizados</div>
+      </div>
+      <div class="stat-card rojo">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label">Ingresos totales</div>
+        <div class="stat-val" style="color:#f87171;font-size:1.6rem">$${Number(resumen.ingresos_totales).toLocaleString('es-CO', {minimumFractionDigits:0})}</div>
+        <div class="stat-sub">ventas + alquileres</div>
+      </div>`;
+
+    // Gráfica ventas vs alquileres
+    if (charts['ventas-alq']) charts['ventas-alq'].destroy();
+    charts['ventas-alq'] = new Chart(document.getElementById('chart-ventas-alq'), {
+      type: 'bar',
+      data: {
+        labels: ['Ventas', 'Alquileres'],
+        datasets: [{
+          label: 'Cantidad',
+          data: [resumen.total_ventas, resumen.total_alquileres],
+          backgroundColor: ['rgba(124,58,237,.7)', 'rgba(79,70,229,.7)'],
+          borderColor: ['#7C3AED', '#4F46E5'],
+          borderWidth: 1, borderRadius: 6
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(255,255,255,.05)' }, ticks: { color: '#8B8BB0' } }, y: { grid: { color: 'rgba(255,255,255,.05)' }, ticks: { color: '#8B8BB0' } } } }
+    });
+
+    // Gráfica ingresos
+    if (charts['ingresos']) charts['ingresos'].destroy();
+    charts['ingresos'] = new Chart(document.getElementById('chart-ingresos'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Ventas', 'Alquileres'],
+        datasets: [{
+          data: [resumen.ingresos_ventas, resumen.ingresos_alquileres],
+          backgroundColor: ['rgba(124,58,237,.8)', 'rgba(96,165,250,.8)'],
+          borderColor: ['#7C3AED', '#60a5fa'], borderWidth: 2
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#D0D0E8' } } } }
+    });
+
+    // Top vendidos mini
+    renderTopMini('top-vendidos-dash', masVendidos.mas_vendidos || [], 'ventas');
+    renderTopMini('top-alquilados-dash', masVendidos.mas_alquilados || [], 'alquileres');
+
+    toast('✅', 'Dashboard actualizado', 'Datos cargados correctamente');
+  } catch (e) {
+    document.getElementById('kpis').innerHTML = `<div class="txt-vacio">⚠️ Error al cargar datos: ${e.message}</div>`;
+  }
+  btn.classList.remove('loading-btn');
+}
+
+function renderTopMini(id, data, tipo) {
+  const el = document.getElementById(id);
+  if (!data.length) { el.innerHTML = '<div class="txt-vacio">Sin datos aún</div>'; return; }
+  const max = data[0].total || 1;
+  el.innerHTML = data.slice(0, 5).map((item, i) => `
+    <div style="margin-bottom:.8rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem">
+        <span style="font-size:.85rem;font-weight:600">${item.video_isan}</span>
+        <span class="${tipo === 'ventas' ? 'badge-ventas' : 'badge-alq'}">${item.total} ${tipo}</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill ${tipo === 'ventas' ? 'fill-morado' : 'fill-azul'}" style="width:${(item.total / max) * 100}%"></div>
+      </div>
+    </div>`).join('');
+}
+
+// ===== VIDEOS =====
+async function cargarVideos() {
+  const grid = document.getElementById('videos-grid');
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando videos...</div>';
+  try {
+    const res = await fetch(API + '/videos');
+    const json = await res.json();
+    videosCache = Array.isArray(json) ? json : (json.data || []);
+    document.getElementById('videos-count').textContent = videosCache.length + ' videos en el catálogo';
+    grid.innerHTML = videosCache.map(v => videoAdminCard(v)).join('');
+    // Cargar thumbs TMDB
+    videosCache.forEach(v => cargarThumb(v));
+  } catch (e) {
+    grid.innerHTML = '<div class="txt-vacio">Error al cargar videos</div>';
+  }
+}
+
+function videoAdminCard(v) {
+  return `<div class="video-admin-card">
+    <div class="video-thumb" id="thumb-${v.isan}">${(v.titulo||'').substring(0,2).toUpperCase()}</div>
+    <div class="video-info">
+      <div class="video-admin-titulo">${v.titulo}</div>
+      <div class="video-admin-meta">${v.anio} · ${v.duracion} min · ${v.formato || 'Digital'}</div>
+      <div class="video-tags">
+        <span class="tag tag-isan">${v.isan}</span>
+        <span class="tag tag-dur">${v.duracion} min</span>
+        ${v.clasificacion ? `<span class="tag tag-cls">${v.clasificacion}</span>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+async function cargarThumb(v) {
+  try {
+    const r = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(v.titulo)}&language=es-ES`);
+    const d = await r.json();
+    const m = d.results && d.results[0];
+    if (m && m.poster_path) {
+      const el = document.getElementById('thumb-' + v.isan);
+      if (el) el.innerHTML = `<img src="${TMDB_IMG + m.poster_path}" alt="${v.titulo}" onerror="this.parentElement.textContent='${(v.titulo||'').substring(0,2).toUpperCase()}'">`;
+    }
+  } catch (e) {}
+}
+
+// ===== CLIENTES =====
+async function cargarClientes() {
+  const lista = document.getElementById('clientes-lista');
+  lista.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando clientes...</div>';
+  try {
+    const res = await fetch(API + '/clientes');
+    const json = await res.json();
+    clientesCache = json.data || json || [];
+    document.getElementById('clientes-count').textContent = clientesCache.length + ' clientes registrados';
+    lista.innerHTML = clientesCache.map(c => clienteRow(c)).join('');
+  } catch (e) {
+    lista.innerHTML = '<div class="txt-vacio">Error al cargar clientes</div>';
+  }
+}
+
+function clienteRow(c) {
+  const ini = (c.nombre || 'CL').substring(0, 2).toUpperCase();
+  const pct = Math.min((c.puntos / 20) * 100, 100);
+  return `<div class="cliente-row">
+    <div class="cliente-avatar">${ini}</div>
+    <div class="cliente-datos">
+      <div class="cliente-nombre">${c.nombre}</div>
+      <div class="cliente-cedula">CC ${c.cedula} · ID: ${c.id.substring(0,8)}...</div>
+      <div style="margin-top:.4rem">
+        <div class="progress-bar" style="width:120px">
+          <div class="progress-fill fill-morado" style="width:${pct}%"></div>
+        </div>
+        <span style="font-size:.7rem;color:var(--gris-text)">${c.puntos}/20 puntos</span>
+      </div>
+    </div>
+    <div style="text-align:right">
+      <div class="cliente-saldo">$${Number(c.saldo).toLocaleString()}</div>
+      <div style="font-size:.7rem;color:var(--gris-text)">saldo</div>
+    </div>
+    <div class="cliente-puntos-wrap" style="margin-left:1rem">
+      <div class="cliente-puntos-num">${c.puntos}</div>
+      <div class="cliente-puntos-label">pts</div>
+    </div>
+  </div>`;
+}
+
+// ===== RANKING =====
+async function cargarRanking() {
+  try {
+    const [topClientes, masVendidos] = await Promise.all([
+      fetch(API + '/gerente/clientes-top').then(r => r.json()),
+      fetch(API + '/gerente/mas-vendidos').then(r => r.json())
+    ]);
+
+    const clientes = topClientes.data || topClientes || [];
+
+    // Ranking por puntos
+    document.getElementById('ranking-clientes').innerHTML = rankingClientesPuntos(clientes);
+    // Ranking por saldo
+    const porSaldo = [...clientes].sort((a, b) => b.saldo - a.saldo);
+    document.getElementById('ranking-saldo').innerHTML = rankingClientesSaldo(porSaldo);
+    // Ranking videos
+    renderRankingVideos('ranking-vendidos', masVendidos.mas_vendidos || [], 'ventas', 'fill-morado');
+    renderRankingVideos('ranking-alquilados', masVendidos.mas_alquilados || [], 'alquileres', 'fill-azul');
+  } catch (e) {
+    ['ranking-clientes','ranking-saldo','ranking-vendidos','ranking-alquilados']
+      .forEach(id => document.getElementById(id).innerHTML = '<div class="txt-vacio">Error al cargar</div>');
+  }
+}
+
+function rankingClientesPuntos(clientes) {
+  if (!clientes.length) return '<div class="txt-vacio">Sin datos</div>';
+  const max = clientes[0].puntos || 1;
+  return `<table class="tabla">
+    <thead><tr><th>#</th><th>Cliente</th><th>Puntos</th></tr></thead>
+    <tbody>${clientes.map((c, i) => `<tr>
+      <td><span class="rank-num ${i < 3 ? 'top' : ''}">${i + 1}</span></td>
+      <td>
+        <div style="font-weight:600;font-size:.88rem">${c.nombre}</div>
+        <div class="progress-bar" style="margin-top:.3rem">
+          <div class="progress-fill fill-morado" style="width:${(c.puntos / max) * 100}%"></div>
+        </div>
+      </td>
+      <td><span class="badge-pts">⭐ ${c.puntos}</span></td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+function rankingClientesSaldo(clientes) {
+  if (!clientes.length) return '<div class="txt-vacio">Sin datos</div>';
+  const max = clientes[0].saldo || 1;
+  return `<table class="tabla">
+    <thead><tr><th>#</th><th>Cliente</th><th>Saldo</th></tr></thead>
+    <tbody>${clientes.map((c, i) => `<tr>
+      <td><span class="rank-num ${i < 3 ? 'top' : ''}">${i + 1}</span></td>
+      <td>
+        <div style="font-weight:600;font-size:.88rem">${c.nombre}</div>
+        <div class="progress-bar" style="margin-top:.3rem">
+          <div class="progress-fill fill-verde" style="width:${(c.saldo / max) * 100}%"></div>
+        </div>
+      </td>
+      <td style="color:var(--verde);font-family:'Bebas Neue',cursive;font-size:1.1rem">$${Number(c.saldo).toLocaleString()}</td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+function renderRankingVideos(id, data, tipo, clase) {
+  const el = document.getElementById(id);
+  if (!data.length) { el.innerHTML = '<div class="txt-vacio">Sin datos aún</div>'; return; }
+  const max = data[0].total || 1;
+  el.innerHTML = `<table class="tabla">
+    <thead><tr><th>#</th><th>ISAN</th><th>${tipo}</th></tr></thead>
+    <tbody>${data.map((item, i) => `<tr>
+      <td><span class="rank-num ${i < 3 ? 'top' : ''}">${i + 1}</span></td>
+      <td>
+        <div style="font-weight:600">${item.video_isan}</div>
+        <div class="progress-bar" style="margin-top:.3rem">
+          <div class="progress-fill ${clase}" style="width:${(item.total / max) * 100}%"></div>
+        </div>
+      </td>
+      <td><span class="${tipo === 'ventas' ? 'badge-ventas' : 'badge-alq'}">${item.total}</span></td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+// ===== HELPERS =====
+function irPagina(nombre, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + nombre).classList.add('active');
+  el.classList.add('active');
+}
+
+function toast(icon, titulo, msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-icon').textContent = icon;
+  document.getElementById('toast-titulo').textContent = titulo;
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 4000);
+}
+</script>
+
+
+</body></html>
