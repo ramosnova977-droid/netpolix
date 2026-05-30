@@ -1,44 +1,60 @@
-#ROUTES (ENDPOINTS API)
 from flask import Blueprint, request, jsonify
-from app.controllers.video_controller import *
+from app.controllers.video_controller import (
+    registrar_video, listar_videos, detalle_video,
+    registrar_serie, registrar_coleccion, agregar_persona,
+    agregar_idioma, listar_categorias, registrar_categoria,
+    agregar_categoria_video, videos_por_categoria
+)
 
 video_bp = Blueprint('video_bp', __name__)
 
-# 1. LISTAR
 @video_bp.route('/videos', methods=['GET'])
 def listar():
-    data = listar_videos()
-    return jsonify({
-        "status": "success",
-        "data": data
-    })
+    return jsonify(listar_videos())
 
-
-# 2. CREAR
 @video_bp.route('/videos', methods=['POST'])
-def crear():
+def registrar():
     data = request.json
-    crear_video(data)
-    return jsonify({"message": "Video creado"})
+    return jsonify(registrar_video(data))
 
+@video_bp.route('/videos/<string:isan>', methods=['GET'])
+def detalle(isan):
+    return jsonify(detalle_video(isan))
 
-# 3. EDITAR
-@video_bp.route('/videos/<isan>', methods=['PUT'])
-def editar(isan):
+@video_bp.route('/videos/series', methods=['POST'])
+def serie():
     data = request.json
-    editar_video(isan, data)
-    return jsonify({"message": "Video actualizado"})
+    return jsonify(registrar_serie(data))
 
-    
-# 4. ELIMINAR
-@video_bp.route('/videos/<isan>', methods=['DELETE'])
-def eliminar(isan):
-    eliminar_video(isan)
-    return jsonify({"message": "Video eliminado"})
+@video_bp.route('/videos/colecciones', methods=['POST'])
+def coleccion():
+    data = request.json
+    return jsonify(registrar_coleccion(data))
 
+@video_bp.route('/videos/personas', methods=['POST'])
+def persona():
+    data = request.json
+    return jsonify(agregar_persona(data))
 
-# 5. BUSCAR
-@video_bp.route('/videos/buscar', methods=['GET'])
-def buscar():
-    texto = request.args.get('q')
-    return jsonify(buscar_video(texto))
+@video_bp.route('/videos/idiomas', methods=['POST'])
+def idioma():
+    data = request.json
+    return jsonify(agregar_idioma(data))
+
+@video_bp.route('/categorias', methods=['GET'])
+def categorias():
+    return jsonify(listar_categorias())
+
+@video_bp.route('/categorias', methods=['POST'])
+def nueva_categoria():
+    data = request.json
+    return jsonify(registrar_categoria(data))
+
+@video_bp.route('/categorias/video', methods=['POST'])
+def categoria_video():
+    data = request.json
+    return jsonify(agregar_categoria_video(data))
+
+@video_bp.route('/categorias/<int:categoria_id>/videos', methods=['GET'])
+def videos_categoria(categoria_id):
+    return jsonify(videos_por_categoria(categoria_id))

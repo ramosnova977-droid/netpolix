@@ -6,7 +6,8 @@ from app.routes.cliente_routes import cliente_bp
 
 from app.routes.venta_routes import venta_bp
 from app.routes.calificacion_routes import calificacion_bp
-
+from app.routes.gerente_routes import gerente_bp
+    
 app = Flask(__name__)
 CORS(app)
 app.register_blueprint(venta_bp)
